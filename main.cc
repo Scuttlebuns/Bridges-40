@@ -11,11 +11,12 @@ using namespace std;
 using namespace bridges;
 
 // This program implements the mountain paths assignment in C++. See the README file
-
+srand(time(0));
 // function prototypes
 ColorGrid *getImage(int *img_arr, int imgWidth, int imgHeight, int maxVal);
 int *readData(int *imgWidth, int *imgHeight, int *maxVal, string file_name);
 void findPath(int *img_arr, int imgWidth, int imgHeight, int startRow, int maxVal);
+
 
 int main(int argc, char **argv) {
 #ifndef MAKEFILE
@@ -34,7 +35,7 @@ int main(int argc, char **argv) {
 
 	// parse command line arguments
 	// argument 2 is input file
-	string filename = "./san_joaquin.dat";
+	string filename = "./colorado2.dat";
 	if (argc >= 2) filename = argv[1]; //This is how you read a command line parameter
 	elev_data = readData(&width, &height, &maxVal, filename);
 
@@ -82,12 +83,12 @@ int *readData(int *width, int *height, int *maxVal, string file_name) {
 	// read the elevation data
 	for (int k = 0; k < size; k++) {
 		infile >>  val;
-
+		
 		// update the max val
 		max = (val > max) ? val : max;
 
 		// store  in elevation array
-		elev_data[k] = val;
+		elev_data[k] = (val >= 0) ? val : 0;
 	}
 	// record the max value
 	*maxVal = max;
@@ -105,7 +106,7 @@ ColorGrid *getImage(int *elev_data, int width, int height, int maxVal) {
 	int n = 0, gray;
 
 	// load the elevation data
-	for (int j = 0; j < height; j++)
+	for (int j = 0; j < height; j++) {
 		for (int k = 0; k < width; k++) {
 			pixel_val = (float) elev_data[n++];
 			if (pixel_val == -1.) {
@@ -117,6 +118,7 @@ ColorGrid *getImage(int *elev_data, int width, int height, int maxVal) {
 				cg->set(j, k, Color(gray, gray, gray));
 			}
 		}
+	}
 	return cg;
 }
 
@@ -149,8 +151,8 @@ void findPath(int *elev_data, int imgWidth, int imgHeight, int startRow, int max
 		if(smallestHeightDiff == 0) row--;	
 		else if(smallestHeightDiff == 2) row++;
 		else row += 0;
-		elev_data[row * imgWidth + col] = -1;
 		//Col always moves to the right
 		col++;
+		elev_data[row * imgWidth + col] = -1;
 	}
 }
